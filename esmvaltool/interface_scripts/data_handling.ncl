@@ -31,9 +31,8 @@ function read_data(info_item[1]:logical)
 ; References
 ;
 ; Modification history
-;   20180511-righi_mattia: adapted to the revised list-based metadata
-;                          structure.
-;   20180212-righi_mattia: written.
+;   20180511_A-righ_ma: adapted to the revised list-based metadata structure.
+;   20180212_A-righ_ma: written.
 ;
 local funcname, scriptname, infile, fin
 begin
@@ -102,9 +101,8 @@ function read_fx_data(info_item[1]:logical,
 ; References
 ;
 ; Modification history
-;   20180511-righi_mattia: adapted to the revised list-based metadata
-;                          structure.
-;   20180526-righi_mattia: written.
+;   20180511_A-righ_ma: adapted to the revised list-based metadata structure.
+;   20180526_A-righ_ma: written.
 ;
 local funcname, scriptname, infile, fin
 begin

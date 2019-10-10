@@ -10,10 +10,10 @@ documentation:
     Written by Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
 
   authors:
-    - demora_lee
+    - demo_le
 
   maintainer:
-    - demora_lee
+    - demo_le
 
   references:
     - demora2018gmd
@@ -89,45 +89,40 @@ preprocessors:
 
   # For a 2D global surface map
   prep_surface_map_2D:
-    climate_statistics:
-      operator: mean
+    time_average:
 
   # For a 3D global surface map
   prep_surface_map_3D:
     extract_levels:
       levels:  [0., ]
       scheme: linear_horizontal_extrapolate_vertical
-    climate_statistics:
-      operator: mean
+    time_average:
 
   prep_surface_map_regrid_3D:
     custom_order: true
     extract_levels:
       levels:  [0., ]
       scheme: linear_horizontal_extrapolate_vertical
-    climate_statistics:
-      operator: mean
+    time_average:
     regrid:
       target_grid: 1x1
       scheme: linear
 
 
   prep_global_profile:
-    annual_statistics:
-      operator: mean
+    annual_mean:
     area_statistics:
       operator: mean
 
   prep_global_profile_decadal:
-    decadal_statistics:
-      operator: mean
+    annual_mean:
+       decadal: true
     area_statistics:
       operator: mean
 
   prep_transect_AMT: # Atlantic Meridional Transect (28W)
     custom_order: true
-    climate_statistics:
-      operator: mean
+    time_average:
     extract_region:
       start_longitude: 320.
       end_longitude: 345.
@@ -143,8 +138,7 @@ preprocessors:
 #   prep_depth_integration:
 #     depth_integration:
 # #      new_units: kg m-2 # need to specify in advance, as cf_units has strange behaviour.
-#     climate_statistics:
-#      operator: mean
+#     time_average:
 #
 #   # 2D map global depth integration time series maps
 #   prep_depth_integration_timeseries:

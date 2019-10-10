@@ -8,12 +8,12 @@ documentation:
     variables (like ozone, sea-ice, aerosol...)
 
   authors:
-    - frank_franziska
-    - righi_mattia
-    - eyring_veronika
+    - fran_fr
+    - righ_ma
+    - eyri_ve
 
   maintainer:
-    - righi_mattia
+    - righ_ma
 
   references:
     - gleckler08jgr

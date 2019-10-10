@@ -134,7 +134,7 @@ begin
                    (/"mean", "stddev"/), \
                    diag_script_info@region, \
                    "zonal", \
-                   (/"frank_franziska", "righi_mattia", "eyring_veronika"/), \
+                   (/"fran_fr", "righ_ma", "eyri_ve"/), \
                    (/"righi15gmd", "gleckler08jgr"/), \
                    info_items[imod]@filename)
 
@@ -209,7 +209,7 @@ begin
                    (/"mean", "stddev", "diff"/), \
                    diag_script_info@region, \
                    "zonal", \
-                   (/"frank_franziska", "righi_mattia", "eyring_veronika"/), \
+                   (/"fran_fr", "righ_ma", "eyri_ve"/), \
                    (/"righi15gmd", "gleckler08jgr"/), \
                    info_items[imod]@filename)
 

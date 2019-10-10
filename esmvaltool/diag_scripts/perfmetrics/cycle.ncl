@@ -140,7 +140,7 @@ begin
                  (/"mean", "stddev"/), \
                  diag_script_info@region, \
                  "seas", \
-                 (/"frank_franziska", "righi_mattia", "eyring_veronika"/), \
+                 (/"fran_fr", "righ_ma", "eyri_ve"/), \
                  (/"righi15gmd", "gleckler08jgr"/), \
                  metadata_att_as_array(info_items, "filename"))
 

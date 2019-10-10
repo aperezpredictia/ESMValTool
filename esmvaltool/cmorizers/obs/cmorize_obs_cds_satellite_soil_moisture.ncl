@@ -25,7 +25,7 @@
 ;    with years)
 ;
 ; Modification history
-;    20190314-crezee_bas: written based on cmorize_obs_esacci_soilmoisture.ncl.
+;    20190314-A_crez_ba: adapted from file cmorize_obs_esacci_soilmoisture.ncl
 ;
 ; #############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -70,8 +70,7 @@ begin
   ; Global attributes
   SOURCE = "https://cds.climate.copernicus.eu/cdsapp#!/" + \
     "dataset/satellite-soil-moisture"
-  REF = "Gruber et al., Earth Syst. Sci. Data, " + \
-    "doi: 10.5194/essd-11-717-2019, 2019."
+  REF = ""
   COMMENT = ""
 
 end

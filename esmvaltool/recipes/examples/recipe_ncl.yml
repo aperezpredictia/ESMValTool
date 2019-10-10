@@ -6,10 +6,10 @@ documentation:
     Example recipe that plots air temperature.
 
   authors:
-    - righi_mattia
+    - righ_ma
 
   maintainer:
-    - righi_mattia
+    - righ_ma
     
   references:
     - acknow_project

@@ -1,18 +1,17 @@
-###############################################################################
+# #############################################################################
 # climdex_df.r
 #
 # Authors: Christian W. Mohr (CICERO, Norway)
 #
-###############################################################################
+#########################################################################################################
 # Description
-#    This script provides a data frame of all the possible indices (core and
-#    user-defined), which can be used with the climdex.pcic.ncdf R-package.
-#    The data frame created serves as an index to find which indices have been
-#    processed, and what title and labels the plots should have.
+#    This script provides a data frame of all the possible indices (core and user-defined),
+#    which can be used with the climdex.pcic.ncdf R-package. The data frame created serves as an index
+#    to find which indices have been processed, and what title and labels the plots should have.
 #
 # Modification history
-#    2018 0725-mohr_christianwilhelm: created
-###############################################################################
+#    2018 0725-A_cwmohr: Created
+#########################################################################################################
 
 idx_df <- data.frame(
   idx_etccdi = c(

@@ -6,11 +6,11 @@ documentation:
     Recipe that demonstrates various uses of the preprocessor derive functionality.
 
   authors:
-    - andela_bouwe
-    - schlund_manuel
+    - ande_bo
+    - schl_ma
 
   maintainer:
-    - righi_mattia
+    - righ_ma
 
   projects:
     - c3s-magic
@@ -124,12 +124,4 @@ diagnostics:
         <<: *cloud
       netcre:
         <<: *toz
-    scripts: null
-
-  diag8:
-    description: Test sispeed
-    variables:
-      clltkisccp:
-        <<: *cloud
-        mip: OImon
     scripts: null

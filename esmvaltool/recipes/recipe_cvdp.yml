@@ -6,11 +6,11 @@ documentation:
     Recipe for executing the NCAR CVDP package in the ESMValTool framework.
 
   authors:
-    - phillips_adam
-    - broetz_bjoern
+    - phil_ad
+    - broe_bj
 
   maintainer:
-    - broetz_bjoern
+    - broe_bj
 
   references:
     - phillips14eos

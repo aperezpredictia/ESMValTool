@@ -8,10 +8,10 @@ documentation:
     fields into the ocean. This work based on the BGC-val toolkit GMD-2018-103.
 
   authors:
-    - demora_lee
+    - demo_le
 
   maintainer:
-    - demora_lee
+    - demo_le
 
   references:
     - demora2018gmd
@@ -141,16 +141,14 @@ preprocessors:
   # Map preprocessors - 2D fields
   # --------------------------------------------------
   prep_map_1: # For Global 2D fields
-    climate_statistics:
-      operator: mean
+    time_average:
 
   prep_map_2: # For Global 2D fields with regridding
     custom_order: true
     regrid:
       target_grid: 1x1
       scheme: linear
-    climate_statistics:
-      operator: mean
+    time_average:
     multi_model_statistics:
       span: overlap
       statistics: [mean ]
@@ -161,8 +159,7 @@ preprocessors:
     extract_levels:
       levels: [0., 10., 100., 1000.,]
       scheme: linear_horizontal_extrapolate_vertical
-    climate_statistics:
-      operator: mean
+    time_average:
     regrid:
       target_grid: 1x1
       scheme: linear
@@ -177,8 +174,7 @@ preprocessors:
       end_longitude: 30.
       start_latitude: -80.
       end_latitude: 80.
-    climate_statistics:
-      operator: mean
+    time_average:
     regrid:
       target_grid: 1x1
       scheme: linear
@@ -191,8 +187,7 @@ preprocessors:
     extract_levels:
       levels: [0., 10., 100., 1000.,]
       scheme: linear_horizontal_extrapolate_vertical
-    climate_statistics:
-      operator: mean
+    time_average:
     extract_region:
       start_longitude: -80.
       end_longitude: 30.
@@ -209,23 +204,20 @@ preprocessors:
   # Transects preprocessors
   # --------------------------------------------------
   prep_transect_1: # For extracting along a trajectory
-    climate_statistics:
-      operator: mean
+    time_average:
     extract_trajectory:
       latitudes: [-5., 5.,]
       longitudes: [332.,332.]
       number_points: 4              # VERY SLOW with high numbers!
 
   prep_transect_2: # For extracting a transect
-    climate_statistics:
-      operator: mean
+    time_average:
     extract_transect: # Pacific Equator
       latitude: 0.
       longitude: [120., 300.]
 
   prep_transect_3: # For extracting a transect
-    climate_statistics:
-      operator: mean
+    time_average:
     extract_transect: # Atlantic Meridional Transect
       latitude: [-50.,50.]
       longitude: 332.
@@ -255,8 +247,7 @@ preprocessors:
   # --------------------------------------------------
   prep_depth_integration_1: # For a 2D map global profile
     depth_integration:
-    climate_statistics:
-      operator: mean
+    time_average:
 
 
 diagnostics:

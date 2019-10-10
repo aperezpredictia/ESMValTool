@@ -6,12 +6,12 @@ documentation:
     Various example preprocessors.
     
   authors:
-    - righi_mattia
-    - andela_bouwe
-    - schlund_manuel
+    - righ_ma
+    - ande_bo
+    - schl_ma
 
   maintainer:
-    - righi_mattia
+    - righ_ma
     
   projects:
     - c3s-magic

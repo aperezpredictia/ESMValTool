@@ -19,7 +19,7 @@
 ;    A registration is required to download the data.
 ;
 ; Modification history
-;    20190311-hassler_birgit: written.
+;    20190311-A_hass_bg: written.
 ;
 ; ############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -64,8 +64,7 @@ begin
   ; Global attributes
   SOURCE = "https://cds.climate.copernicus.eu/cdsapp#!/dataset/" + \
     "satellite-methane?tab=form"
-  REF = "Buchwitz et al., Adv. Astronaut. Sci. Technol., " + \
-    "doi:10.1007/s42423-018-0004-6, 2018."
+  REF = ""
   COMMENT = ""
 
 end

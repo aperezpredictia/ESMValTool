@@ -6,11 +6,11 @@ documentation:
     Example recipe that plots the mean precipitation and temperature.
 
   authors:
-    - andela_bouwe
-    - righi_mattia
+    - ande_bo
+    - righ_ma
 
   maintainer:
-    - schlund_manuel
+    - schl_ma
 
   references:
     - acknow_project
@@ -21,6 +21,7 @@ documentation:
 
 datasets:
   - {dataset: CanESM2,  project: CMIP5,  mip: Amon,  exp: historical,  ensemble: r1i1p1,  start_year: 2000,  end_year: 2002}
+  - {dataset: GFDL-ESM2G,  project: CMIP5,  mip: Amon,  exp: historical,  ensemble: r1i1p1,  start_year: 2000,  end_year: 2002}
   - {dataset: MPI-ESM-LR,  project: CMIP5,  mip: Amon,  exp: historical,  ensemble: r1i1p1,  start_year: 2000,  end_year: 2002}
 
 preprocessors:
@@ -30,7 +31,7 @@ preprocessors:
       levels: 85000
       scheme: nearest
     regrid:
-      target_grid: 1x1
+      target_grid: reference_dataset
       scheme: linear
     multi_model_statistics:
       span: overlap
@@ -47,7 +48,9 @@ diagnostics:
     variables:
       ta:
         preprocessor: preprocessor1
+        reference_dataset: CanESM2
       pr:
+        reference_dataset: MPI-ESM-LR
     scripts:
       script1:
         script: examples/diagnostic.py

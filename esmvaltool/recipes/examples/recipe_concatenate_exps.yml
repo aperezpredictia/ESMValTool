@@ -6,10 +6,10 @@ documentation:
     Concatenate time series of different experiments at the preprocessor level.
 
   authors:
-    - schlund_manuel
+    - schl_ma
 
   maintainer:
-    - schlund_manuel
+    - schl_ma
 
 datasets:
   - {dataset: CanESM2}

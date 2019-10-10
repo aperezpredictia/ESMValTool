@@ -156,7 +156,7 @@ dev.off()
 
 # Set provenance for output files
 xprov <- list(ancestors = list(fullpath_filenames),
-              authors = list("hunter_alasdair", "manubens_nicolau"),
+              authors = list("hunt_al", "manu_ni"),
               projects = list("c3s-magic"),
               caption = "Combined selection",
               statistics = list("other"),

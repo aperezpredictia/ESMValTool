@@ -19,7 +19,7 @@
 ;    A registration is required to download the data.
 ;
 ; Modification history
-;    20190319-hassler_birgit: written.
+;    20190319-A_hass_bg: written.
 ;
 ; ############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -38,7 +38,7 @@ begin
 
   ; Period
   YEAR1 = 2003
-  YEAR2 = 2017
+  YEAR2 = 2016
 
   ; Selected variable (standard name)
   VAR = (/"xco2"/)
@@ -64,8 +64,7 @@ begin
   ; Global attributes
   SOURCE = "https://cds.climate.copernicus.eu/cdsapp#!/dataset/" + \
     "satellite-carbon-dioxide?tab=form"
-  REF = "Buchwitz et al., Adv. Astronaut. Sci. Technol., " + \
-    "doi:10.1007/s42423-018-0004-6, 2018."
+  REF = ""
   COMMENT = ""
 
 end
@@ -78,8 +77,8 @@ begin
     log_info("Processing " + VAR(vv) + " (" + MIP(vv) + ")")
 
     ; Read variables
-    fname = input_dir_path + "OBS_" + OBSNAME + "_sat_L3_v31_" + NAME(vv) + \
-      "_" + YEAR1 + "01-" + YEAR2 + "12.nc"
+    fname = input_dir_path + "OBS_" + OBSNAME + "_sat_L3_" + NAME(vv) + \
+      "_200301-201612.nc"
     setfileoption("nc", "MissingToFillValue", False)
     f = addfile(fname, "r")
     output = f->xco2

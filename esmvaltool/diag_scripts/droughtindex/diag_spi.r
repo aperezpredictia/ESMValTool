@@ -76,7 +76,7 @@ refmsk[refmsk > 10000] <- NA
 refmsk[!is.na(refmsk)] <- 1
 
 xprov <- list(ancestors = list(""),
-              authors = list("berg_peter"),
+              authors = list("berg_pe"),
               references = list("mckee93"),
               projects = list("c3s-magic"),
               caption = "",

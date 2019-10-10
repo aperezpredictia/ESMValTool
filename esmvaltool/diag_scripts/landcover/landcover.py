@@ -309,12 +309,7 @@ def get_timmeans(attr, cubes, refset, prov_rec):
             'statistics': ['mean'],
             'domains': ['global'],
             'plot_type': 'regional averages',
-            'authors': [
-                'hagemann_stefan',
-                'loew_alexander',
-                'mueller_benjamin',
-                'stacke_tobias',
-            ],
+            'authors': ['hage_st', 'loew_al', 'muel_bn', 'stac_to'],
             'references': [
                 'acknow_project',
             ],

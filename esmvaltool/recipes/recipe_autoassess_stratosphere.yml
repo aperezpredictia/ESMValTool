@@ -18,10 +18,10 @@ documentation:
     file request in this namelist when running.
 
   authors:
-    - predoi_valeriu
+    - pred_va
 
   maintainer:
-    - predoi_valeriu
+    - pred_va
 
 datasets:
   - {dataset: MPI-ESM-LR,  project: CMIP5,  mip: Amon,  exp: amip,  ensemble: r1i1p1,  start_year: 1992,  end_year: 2002}
