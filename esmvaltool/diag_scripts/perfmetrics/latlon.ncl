@@ -33,46 +33,121 @@ begin
     ; Set path for saving processed data
     system("mkdir -p " + config_user_info@work_dir)
     
-    fname_abs = \
-      str_join((/"perfmetrics", "latlon","Mean", annots(imod), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
-                 
-    fname_std = \
-      str_join((/"perfmetrics", "latlon","STD", annots(imod), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
-                 
-    fname_trend = \
-      str_join((/"perfmetrics", "latlon","Trend", annots(imod), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
+    data_category = info_items[imod]@project
+    if (data_category.eq.("CORDEX")) then
+      rcm = info_items[imod]@dataset
+      gcm = info_items[imod]@driver
+      scenario = info_items[imod]@exp
+      ensemble = info_items[imod]@ensemble
+      fname_abs = \
+        str_join((/"Mean",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_std = \
+        str_join((/"Standard_deviation",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_trend = \
+        str_join((/"Trend",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff = \
+        str_join((/"Bias",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_std = \
+        str_join((/"STD_Diff",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_trend = \
+        str_join((/"Trend_Diff",\
+                   rcm, gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      output_path = \
+        str_join((/data_category, rcm, gcm, scenario,\
+                   ensemble, var0/), "/")
+
+    else if (data_category.eq.("CMIP5")) then
+      gcm = info_items[imod]@dataset
+      scenario = info_items[imod]@exp
+      ensemble = info_items[imod]@ensemble
+      fname_abs = \
+        str_join((/"Mean",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_std = \
+        str_join((/"Standard_deviation",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_trend = \
+        str_join((/"Trend",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff = \
+        str_join((/"Bias",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_std = \
+        str_join((/"STD_Diff",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_trend = \
+        str_join((/"Trend_Diff",\
+                   gcm, scenario, ensemble + "-" + annots(ref_ind), var0/), "_")
+
+      output_path = \
+        str_join((/data_category, gcm, scenario,\
+                   ensemble, var0/), "/")
+
+
+    else
+      gcm = info_items[imod]@dataset
+      fname_abs = \
+        str_join((/"Mean",\
+                 gcm + "-" + annots(ref_ind), var0/), "_")
+
+      fname_std = \
+        str_join((/"Standard_deviation",\
+                 gcm + "-" + annots(ref_ind), var0/), "_")
+
+      fname_trend = \
+        str_join((/"Trend",\
+                 gcm + "-" + annots(ref_ind), var0/), "_")
+      fname_diff = \
+        str_join((/"Bias",\
+                   gcm + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_std = \
+        str_join((/"STD_Diff",\
+                   gcm + "-" + annots(ref_ind), var0/), "_")
+
+      fname_diff_trend = \
+        str_join((/"Trend_Diff",\
+                   gcm + "-" + annots(ref_ind), var0/), "_")
+
+      output_path = \
+        str_join((/data_category, gcm,\
+                   var0/), "/")
+    end if
+    end if
                               
     workpath_abs = config_user_info@work_dir + fname_abs + ".nc"
     workpath_trend = config_user_info@work_dir + fname_trend + ".nc"
+
+    final_output_path = config_user_info@plot_dir + output_path + "/"
+    ; Set path for saving plots
+    system("mkdir -p " + final_output_path)
     
-    plotpath_abs = config_user_info@plot_dir + fname_abs
-    plotpath_std = config_user_info@plot_dir + fname_std
-    plotpath_trend = config_user_info@plot_dir + fname_trend
-    
-     
-    fname_diff = \
-      str_join((/"perfmetrics", "latlon", "Bias",\
-                 annots(imod) + "-" + annots(ref_ind), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
-                 
-    fname_diff_std = \
-      str_join((/"perfmetrics", "latlon", "STD_Diff",\
-                 annots(imod) + "-" + annots(ref_ind), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
-                 
-    fname_diff_trend = \
-      str_join((/"perfmetrics", "latlon","Trend_Diff", \
-                 annots(imod) + "-" + annots(ref_ind), var0, \
-                 diag_script_info@time_avg, diag_script_info@region/), "_")
+    plotpath_abs = final_output_path + fname_abs
+    plotpath_std = final_output_path + fname_std
+    plotpath_trend = final_output_path + fname_trend
                  
                         
     workpath_diff = config_user_info@work_dir + fname_diff + ".nc"
-    plotpath_diff = config_user_info@plot_dir + fname_diff
-    plotpath_diff_std = config_user_info@plot_dir + fname_diff_std
-    plotpath_diff_trend = config_user_info@plot_dir + fname_diff_trend
+
+    plotpath_diff = final_output_path + fname_diff
+    plotpath_diff_std = final_output_path + fname_diff_std
+    plotpath_diff_trend = final_output_path + fname_diff_trend
     
         
     ; Determine start/end year
@@ -85,6 +160,58 @@ begin
     ; Read data
     var = read_data(info_items[imod])
     dnames = getVarDimNames(var)
+
+
+
+   print(getvardimnames(var) + " : " + dimsizes(var)) 
+   print(var@units)
+
+
+ ; Change unit of Temperature
+     ; K to C 
+     ; -273.15
+  if (var@units .eq. "K") then
+     var = var -273.15
+     var@units = "C"	
+  end if
+
+
+   
+ ; Change unit of Precipitation 
+     ; kg m-2 s-1   to mm/day 
+     ; pr1 *= (60*60*24) 
+  if (var@units .eq. "kg m-2 s-1") then
+     var = var * (60 * 60 * 24)
+     var@units = "mm/day"
+     var@long_name = "precipitation" ;
+	 var@standard_name = "precipitation" ;
+	
+  end if
+
+
+
+
+
+;print(var@units)
+;time_spl = var&time
+;print(time_spl@calendar)
+  
+;"standard" (the default)
+;"gregorian"
+;"julian"
+;"360_day", "360"
+;"365_day", "365"
+;"366_day", "366"
+;"noleap", "no_leap"
+;"allleap", "all_leap"
+;"none"
+
+;yearP = ispan (start_year,end_year,1) 
+;monthP =  ispan (1,12,1) 
+;yearP@calendar = time_spl@calendar
+;NDM = days_in_month(yearP,monthP)  
+;print(NDM)
+   
 
 
 
@@ -188,11 +315,11 @@ begin
       var_diff_trend = var_all_trend(:, :, 0)
       var_diff_trend = ((var_all_trend(:, :, 0) - var_ref_trend(:, :, 0)) /  var_ref_trend(:, :, 0))  
       ;var_diff_trend = var_all_trend(:, :, 0) - var_ref_trend(:, :, 0) 
-      var_diff_trend = where(abs(var_diff_trend).ge.1000.0,0,var_diff_trend) 
       
       var_diff_trend@units = " "
       var_diff_std@units = " "
       
+      var_diff = where(abs(var_diff).ge.1000.0,0,var_diff) 
       var_diff_std = where(abs(var_diff_std).ge.1000.0,0,var_diff_std) 
       var_diff_trend = where(abs(var_diff_trend).ge.1000.0,0,var_diff_trend)
       
@@ -236,7 +363,7 @@ begin
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
-    plot_var@res_tiMainString = "[ " + annots(imod) + " ]" + " Means (Annual) "
+    plot_var@res_tiMainString = annots(imod) + " : Means (Annual) "
     plot_var@res_cnLevels = diag_script_info@abs_levs
     
     plot_var@res_gsnLeftString = \
@@ -264,7 +391,7 @@ begin
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
-    plot_var@res_tiMainString = "[ " + annots(imod) + " ]" + " Standard Deviations (Annual) "
+    plot_var@res_tiMainString = annots(imod) + " : Standard Deviations (Annual) "
     plot_var@res_cnLevels = diag_script_info@std_levs
     plot_var@res_gsnLeftString = \
       plot_var@long_name 
@@ -291,7 +418,7 @@ begin
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
-    plot_var@res_tiMainString =  "[ " + annots(imod) + " ]" + " Trends (Annual) "
+    plot_var@res_tiMainString = annots(imod) + " : Trends (Annual) "
     plot_var@res_cnLevels = diag_script_info@trend_levs
     ;plot_var@res_gsnLeftString = \
     ;  plot_var@long_name + " [" + format_units(plot_var@units) + "]"
@@ -304,6 +431,10 @@ begin
         sprintf("%5.2f", gavg) + " " + format_units(plot_var@units)
     end if
     wks = gsn_open_wks(file_type, plotpath_trend)
+     setvalues NhlGetWorkspaceObjectId()
+         "wsMaximumSize" :150000000
+     end setvalues
+     
     gsn_define_colormap(wks, diag_script_info@latlon_cmap)
     plot = contour_map_ce(wks, plot_var, var0)
     draw(plot)
@@ -333,7 +464,7 @@ begin
     end if
     plot_var = var_diff
     plot_var@projection = diag_script_info@projection
-    plot_var@res_tiMainString = " [  " + annots(imod) + " - " + annots(ref_ind) + "  ] " + " Bias (Annual) "
+    plot_var@res_tiMainString = annots(imod) + " - " + annots(ref_ind) + " : Bias (Annual) "
     if (isatt(diag_script_info, "t_test")) then
       plot_var@res_gsnLeftString = plot_var@res_gsnLeftString + " - " + \
         sprinti("%2i", toint(100 * diag_script_info@conf_level)) + "% c.l."
@@ -353,55 +484,65 @@ begin
         sprintf("%5.2f", gavg) + " " + format_units(plot_var@units)
     end if
     wks = gsn_open_wks(file_type, plotpath_diff)
+   ;  setvalues NhlGetWorkspaceObjectId()
+   ;      "wsMaximumSize" :300000000
+   ;  end setvalues
+     
     gsn_merge_colormaps(wks, "temp_19lev", "gray70")
     plot = contour_map_ce(wks, plot_var, var0)
     delete(plot_var@res_cnLevels)
+    draw(plot)
+    frame(wks)
+    delete(wks)
+    delete(plot)
+    
 
-    ; Apply t-test (assuming different population variances)
-    caption = "Difference in geographical distribution of variable " + var0
-    if (diag_script_info@t_test) then
-      x1 = var_all(:, :, 0)
-      x2 = var_ref(:, :, 0)
-      s1 = var_all(:, :, 1) ^ 2
-      s2 = var_ref(:, :, 1) ^ 2
-      n1 = info_items[imod]@end_year - info_items[imod]@start_year + 1
-      n2 = info_items[ref_ind]@end_year - info_items[ref_ind]@start_year + 1
-      prob = ttest(x1, s1, n1, x2, s2, n2, True, False)
-      mask_var = 1. - prob
-      copy_VarCoords(plot_var, mask_var)
-      delete(prob)
+
+ ;   ; Apply t-test (assuming different population variances)
+     caption = "Difference in geographical distribution of variable " + var0
+ ;   if (diag_script_info@t_test) then
+ ;     x1 = var_all(:, :, 0)
+ ;     x2 = var_ref(:, :, 0)
+ ;     s1 = var_all(:, :, 1) ^ 2
+ ;     s2 = var_ref(:, :, 1) ^ 2
+ ;     n1 = info_items[imod]@end_year - info_items[imod]@start_year + 1
+ ;     n2 = info_items[ref_ind]@end_year - info_items[ref_ind]@start_year + 1
+ ;     prob = ttest(x1, s1, n1, x2, s2, n2, True, False)
+ ;     mask_var = 1. - prob
+ ;     copy_VarCoords(plot_var, mask_var)
+ ;     delete(prob)
 
       ; Mask non-significant values
-      res2 = True
-      res2@cnLevelSelectionMode = "ExplicitLevels"
-      res2@cnLevels = (/0.0, diag_script_info@conf_level, 1.0/)
-      res2@cnInfoLabelOn = False
-      res2@cnLinesOn = False
-      res2@cnLineLabelsOn = False
-      res2@gsnDraw = False
-      res2@gsnFrame = False
-      plot2 = gsn_csm_contour(wks, mask_var, res2)
-      opt = True
-      if (diag_script_info@stippling) then
-        opt@gsnShadeFillType = "pattern"
-        opt@gsnShadeLow = 17
-        caption = caption + " (non-significant points are stippled)"
-      else
-        opt@gsnShadeFillType = "color"
-        opt@gsnShadeLow = "gray70"
-        caption = caption + " (non-significant points are masked out in gray)"
-      end if
-      plot2 = gsn_contour_shade(plot2, diag_script_info@conf_level, 999., opt)
-      overlay(plot, plot2)
-      draw(plot)
-      frame(wks)
-      delete(wks)
-      delete(plot)
-      delete(plot2)
-      delete(mask_var)
-      delete(plot_var)
+ ;     res2 = True
+ ;     res2@cnLevelSelectionMode = "ExplicitLevels"
+ ;     res2@cnLevels = (/0.0, diag_script_info@conf_level, 1.0/)
+ ;     res2@cnInfoLabelOn = False
+ ;     res2@cnLinesOn = False
+ ;     res2@cnLineLabelsOn = False
+ ;     res2@gsnDraw = False
+ ;     res2@gsnFrame = False
+ ;     plot2 = gsn_csm_contour(wks, mask_var, res2)
+ ;     opt = True
+ ;     if (diag_script_info@stippling) then
+ ;       opt@gsnShadeFillType = "pattern"
+ ;       opt@gsnShadeLow = 17
+ ;       caption = caption + " (non-significant points are stippled)"
+ ;     else
+ ;       opt@gsnShadeFillType = "color"
+ ;       opt@gsnShadeLow = "gray70"
+ ;       caption = caption + " (non-significant points are masked out in gray)"
+ ;     end if
+ ;     plot2 = gsn_contour_shade(plot2, diag_script_info@conf_level, 999., opt)
+ ;     overlay(plot, plot2)
+ ;     draw(plot)
+ ;     frame(wks)
+ ;     delete(wks)
+ ;     delete(plot)
+ ;     delete(plot2)
+ ;     delete(mask_var)
+ ;     delete(plot_var)
 
-    end if
+ ;  end if
 
     ; Difference plot STD to the reference
     if (.not.l_diff) then
@@ -409,7 +550,7 @@ begin
     end if
     plot_var = var_diff_std
     plot_var@projection = diag_script_info@projection
-    plot_var@res_tiMainString = " [( " + annots(imod) + " - " + annots(ref_ind) + " ) / " + annots(ref_ind) + "  ]" + " Standard Deviations (Annual) "
+    plot_var@res_tiMainString = "( " + annots(imod) + " - " + annots(ref_ind) + " ) / " + annots(ref_ind) + " : Standard Deviations (Annual) "
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
     plot_var@res_cnLevels = diag_script_info@std_diff_levs
     plot_var@res_cnMissingValFillColor = "gray70"
@@ -425,6 +566,9 @@ begin
         sprintf("%5.2f", gavg) + " " + format_units(plot_var@units)
     end if
     wks = gsn_open_wks(file_type, plotpath_diff_std)
+;     setvalues NhlGetWorkspaceObjectId()
+;         "wsMaximumSize" :150000000
+;     end setvalues
     gsn_merge_colormaps(wks, "temp_19lev", "gray70")
     plot = contour_map_ce(wks, plot_var, var0)
     delete(plot_var@res_cnLevels)
@@ -440,7 +584,7 @@ begin
     end if
     plot_var = var_diff_trend
     plot_var@projection = diag_script_info@projection
-    plot_var@res_tiMainString = " [( " + annots(imod) + " - " + annots(ref_ind) + " ) / " + annots(ref_ind) + "]" + "  Trends (Annual) "
+    plot_var@res_tiMainString = "( " + annots(imod) + " - " + annots(ref_ind) + " ) / " + annots(ref_ind) + " : Trends (Annual) "
     ;plot_var@res_tiMainString = annots(imod) + " - " + annots(ref_ind) + " [ Trend] "
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
     plot_var@res_cnLevels = diag_script_info@trend_diff_levs
@@ -459,7 +603,7 @@ begin
     
     wks = gsn_open_wks(file_type, plotpath_diff_trend)
      setvalues NhlGetWorkspaceObjectId()
-         "wsMaximumSize" :150000000
+         "wsMaximumSize" :300000000
      end setvalues
   
     var5 = var0 

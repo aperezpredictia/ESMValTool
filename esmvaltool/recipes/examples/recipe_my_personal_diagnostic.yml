@@ -17,29 +17,23 @@ documentation:
     - pred_va
 
 datasets:
-  - {dataset: MPI-ESM-LR,  project: CMIP5, exp: historical,  ensemble: r1i1p1,  start_year: 2000,  end_year: 2002}
-  - {dataset: NorESM1-M,   project: CMIP5, exp: historical,  ensemble: r1i1p1,  start_year: 2001,  end_year: 2005}
+  - {dataset: GISS-E2-R-CC, project: CMIP5, exp: historical, mip: Amon, ensemble: r1i1p1, start_year: 1981, end_year: 1990}
+  - {dataset: ERA5, project: OBS, version: 1, mip: Amon, type: reanaly, tier: 3, start_year: 1981, end_year: 1990}
 
 preprocessors:
   pp:
     regrid:
-      target_grid: 1x1
+      target_grid: reference_dataset
       scheme: linear
 
 diagnostics:
   simple:
     description: "Simple personal diagnostic"
     variables:
-      ta:
+      tas:
         preprocessor: pp
-        mip: Amon
-      sftlf:
-        mip: fx
-      sftof:
-        mip: fx
-      areacello:
-        mip: fx
+        reference_dataset: ERA5
     scripts:
       my_diagnostic:
-        script: /path/to/your/my_little_diagnostic.py
+        script: examples/my_little_diagnostic.py
 
