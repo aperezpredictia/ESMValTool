@@ -35,7 +35,7 @@ begin
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Defining plot titles/ file name/ output image directory name / output netCDF directory name   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Defining plot titles/ file name/ output image directory name / output netCDF directory name   @@@@@@@@@@@@@@
 
     data_category = info_items[imod]@project
     if (data_category.eq.("CORDEX")) then
@@ -139,7 +139,7 @@ begin
     final_output_path_ncfiles = config_user_info@work_dir + output_path + "/"
     ; Set path for saving plots
     system("mkdir -p " + final_output_path_ncfiles)
-                              
+
     workpath_abs = final_output_path_ncfiles  + fname_abs + ".nc"
     workpath_std = final_output_path_ncfiles + fname_std + ".nc"
     workpath_trend = final_output_path_ncfiles + fname_trend + ".nc"
@@ -147,26 +147,26 @@ begin
     final_output_path = config_user_info@plot_dir + output_path + "/"
     ; Set path for saving plots
     system("mkdir -p " + final_output_path)
-    
+
     plotpath_abs = final_output_path + fname_abs
     plotpath_std = final_output_path + fname_std
     plotpath_trend = final_output_path + fname_trend
-                 
-                        
+
+
     workpath_diff = final_output_path_ncfiles + fname_diff + ".nc"
     workpath_diff_std = final_output_path_ncfiles + fname_diff_std + ".nc"
     workpath_diff_trend = final_output_path_ncfiles + fname_diff_trend + ".nc"
-    
+
 
     plotpath_diff = final_output_path + fname_diff
     plotpath_diff_std = final_output_path + fname_diff_std
     plotpath_diff_trend = final_output_path + fname_diff_trend
 
-; @@@@@@@@@@@@@@  END: Defining plot titles/ file name/ output image directory name / output netCDF directory name   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  END: Defining plot titles/ file name/ output image directory name / output netCDF directory name   @@@@@@@@@@@@@@
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    
-        
+
+
     ; Determine start/end year
     start_year = info_items[imod]@start_year
     end_year = info_items[imod]@end_year
@@ -180,155 +180,155 @@ begin
 
 
 
-   print(getvardimnames(var) + " : " + dimsizes(var)) 
+   print(getvardimnames(var) + " : " + dimsizes(var))
    print(var@units)
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Change of units (now, it is not neccessary)   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Change of units (now, it is not neccessary)   @@@@@@@@@@@@@@
 
  ; Change unit of Temperature
-     ; K to C 
+     ; K to C
      ; -273.15
  ; if (var@units .eq. "K") then
  ;    var = var -273.15
- ;    var@units = "C"	
+ ;    var@units = "C"
  ; end if
 
 
-   
- ; Change unit of Precipitation 
-     ; kg m-2 s-1   to mm/day 
-     ; pr1 *= (60*60*24) 
+
+ ; Change unit of Precipitation
+     ; kg m-2 s-1   to mm/day
+     ; pr1 *= (60*60*24)
  ; if (var@units .eq. "kg m-2 s-1") then
  ;    var = var * (60 * 60 * 24)
  ;    var@units = "mm/day"
  ;    var@long_name = "precipitation" ;
  ;    var@standard_name = "precipitation" ;
-	
+
  ; end if
 
-; @@@@@@@@@@@@@@  END: Change of units (now, it is not neccessary)   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  END: Change of units (now, it is not neccessary)   @@@@@@@@@@@@@@
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Calculation of mean and standard deviation   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Calculation of mean and standard deviation   @@@@@@@@@@@@@@
 
     ; Calculate time average and standard dev. w.r.t. interannual variablity
-    
+
     var_avg = time_operations(var, start_year, end_year, "average", \
                               diag_script_info@time_avg, True)
     var_std = interannual_variability(var, start_year, end_year, \
                                       diag_script_info@time_avg, "None")
-    
+
     var_ann = time_operations(var, start_year, end_year, "average", \
                               "yearly", True)
-    
+
     var_ann!0 = "time"
 
-; @@@@@@@@@@@@@@  END: Calculation of mean and standard deviation   @@@@@@@@@@@@@@ 
-    
+; @@@@@@@@@@@@@@  END: Calculation of mean and standard deviation   @@@@@@@@@@@@@@
+
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     
-;@@@@@@@@@   BEGIN:  Trend Calculation    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  
-      
+
+;@@@@@@@@@   BEGIN:  Trend Calculation    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     trends_ann  = var(0,:,:)
     tarr = var_ann
 
-       
-    tttt = dtrend_msg_n(ispan(0,dimsizes(tarr&time)-1,1),tarr,False,True,0)   
+
+    tttt = dtrend_msg_n(ispan(0,dimsizes(tarr&time)-1,1),tarr,False,True,0)
 
     var_trend = (/ onedtond(tttt@slope, (/dimsizes(tarr&lat),dimsizes(tarr&lon)/) ) /)
 
     var_trend!0 = "lat"
     var_trend!1 = "lon"
-    
+
     var_trend&lat = var_avg&lat
     var_trend&lon = var_avg&lon
-     
-    delete([/tarr,tttt/])        
+
+    delete([/tarr,tttt/])
 
     var_trend = var_trend * nyr
-    var_trend@units = var_ann@units+" "+ nyr +"yr~S~-1~N~"   
-    
+    var_trend@units = var_ann@units+" "+ nyr +"yr~S~-1~N~"
+
    ; print(nyr)
-   ; print(getvardimnames(trends_ann) + " : " + dimsizes(trends_ann)) 
-   ; print(trends_ann@units)      
-    delete([/var_ann/])    
-     
-       
-    var_trend = where(abs(var_trend).ge.1000.0,var_trend@_FillValue,var_trend) 
-            
+   ; print(getvardimnames(trends_ann) + " : " + dimsizes(trends_ann))
+   ; print(trends_ann@units)
+    delete([/var_ann/])
+
+
+    var_trend = where(abs(var_trend).ge.1000.0,var_trend@_FillValue,var_trend)
+
     delete(var)
 
-  
+
   ; Store data in for model and reference in same array
-     
+
     var_all = new(array_append_record(dimsizes(var_avg), 2, 0), float)
     var_all_trend = new(array_append_record(dimsizes(var_avg), 1, 0), float)
-    
-      
+
+
     var_all!2 = "statistic"
     var_all&statistic = (/"mean", "stddev"/)
     var_all(:, :, 0) = var_avg
     var_all(:, :, 1) = var_std
-    
+
     var_all_trend!2 = "statistic"
     var_all_trend&statistic = (/"trend"/)
     var_all_trend(:, :, 0) = var_trend
-    
-   
+
+
     var_all@var = var0
     var_all@diag_script = (/DIAG_SCRIPT/)
     copy_VarAtts(diag_script_info, var_all)
     var_all@ref_model = variable_info[0]@reference_dataset
-    
-    
+
+
     var_all_trend@var = var0
     var_all_trend@diag_script = (/DIAG_SCRIPT/)
     copy_VarAtts(diag_script_info, var_all_trend)
     var_all_trend@ref_model = variable_info[0]@reference_dataset
-    
+
     delete(var_avg)
     delete(var_std)
     delete(var_trend)
-    
+
 
   ; Store reference dataset
     if (imod.eq.ref_ind) then
       var_ref = var_all
       var_ref_trend = var_all_trend
     end if
- 
-  
+
+
     ; Calculate difference
     if (l_diff) then
       var_diff = var_all(:, :, 0)
       var_diff = var_all(:, :, 0) - var_ref(:, :, 0)
-      
+
       var_diff_std = var_all(:, :, 1)
-      var_diff_std = ((var_all(:, :, 1) - var_ref(:, :, 1)) /  var_ref(:, :, 1))  
-      ;var_diff_std = var_all(:, :, 1) - var_ref(:, :, 1) 
-      
+      var_diff_std = ((var_all(:, :, 1) - var_ref(:, :, 1)) /  var_ref(:, :, 1))
+      ;var_diff_std = var_all(:, :, 1) - var_ref(:, :, 1)
+
       var_ref_trend@_FillValue = 0.0
       var_diff_trend = var_all_trend(:, :, 0)
-      var_diff_trend = ((var_all_trend(:, :, 0) - var_ref_trend(:, :, 0)) /  var_ref_trend(:, :, 0))  
-      ;var_diff_trend = var_all_trend(:, :, 0) - var_ref_trend(:, :, 0) 
-      
+      var_diff_trend = ((var_all_trend(:, :, 0) - var_ref_trend(:, :, 0)) /  var_ref_trend(:, :, 0))
+      ;var_diff_trend = var_all_trend(:, :, 0) - var_ref_trend(:, :, 0)
+
       var_diff_trend@units = " "
       var_diff_std@units = " "
-      
-      var_diff = where(abs(var_diff).ge.1000.0,var_diff@_FillValue,var_diff) 
-      var_diff_std = where(abs(var_diff_std).ge.1000.0,var_diff_std@_FillValue,var_diff_std) 
+
+      var_diff = where(abs(var_diff).ge.1000.0,var_diff@_FillValue,var_diff)
+      var_diff_std = where(abs(var_diff_std).ge.1000.0,var_diff_std@_FillValue,var_diff_std)
       var_diff_trend = where(abs(var_diff_trend).ge.1000.0,var_diff_trend@_FillValue,var_diff_trend)
-      
+
     end if
 
-;@@@@@@@@@   END:  Trend Calculation    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  
+;@@@@@@@@@   END:  Trend Calculation    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;@@@@@@@@@   BEGIN:  NetCDF production    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  
+;@@@@@@@@@   BEGIN:  NetCDF production    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     ; Write output
     if (config_user_info@write_netcdf) then
@@ -353,7 +353,7 @@ begin
       end if
     end if
 
-;@@@@@@@@@   END:  NetCDF production    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  
+;@@@@@@@@@   END:  NetCDF production    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
@@ -372,18 +372,19 @@ begin
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute mean over the total period   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute mean over the total period   @@@@@@@@@@@@@@
 
    print(" Ploting absolute plot  Clim")
     ; Absolute plot
     plot_var = var_all(:, :, 0)
-    
+
     ; Need to convert all the missing values to NaN, not to 0
-    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var) 
+    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var)
+
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
-   
+
     ; The title of the figure depends on the data category (CORDEX, CMIP5, ERA5, ...)
     if (data_category.eq.("CORDEX")) then
     	plot_var@res_tiMainString = info_items[imod]@dataset + " / " + plot_var@long_name  + " / " +  "Mean"
@@ -399,7 +400,7 @@ begin
    plot_var@res_cnLevels = diag_script_info@abs_levs
    plot_var@res_gsnLeftString = \
       		"Annual / " + start_year + " - " + end_year
-    
+
     if (diag_script_info@show_global_avg) then  ; append global average
       gavg = area_operations(plot_var, -90., 90., 0., 360., "average", True)
       if (info_items[imod]@short_name.eq.("pr")) then
@@ -411,14 +412,14 @@ begin
       end if
       end if
     end if
-    
+
     plot_var@res_lbOrientation = "vertical"; vertical label bar
     plot_var@res_gsnMaximize = True ; maximize plot in frame
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels)
     else if (info_items[imod]@short_name.eq.("tas")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels)
     end if
     end if
 
@@ -435,10 +436,10 @@ begin
     txres@txJust        = "CenterLeft"              ; Default is "CenterCenter".
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres)
     else if (info_items[imod]@short_name.eq.("tas")) then
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
@@ -450,29 +451,32 @@ begin
     delete(plot_var@res_lbLabelStrings)
     delete(wks)
     delete(plot)
- 
-; @@@@@@@@@@@@@@  END: Plot for the absolute mean over the total period   @@@@@@@@@@@@@@ 
+
+; @@@@@@@@@@@@@@  END: Plot for the absolute mean over the total period   @@@@@@@@@@@@@@
 
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute standard deviation over the total period   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute standard deviation over the total period   @@@@@@@@@@@@@@
 
    print(" Ploting absolute plot  STD")
 
     ; Standard deviation plot
     plot_var = var_all(:, :, 1)
-    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var) 
+
+    ; Need to convert all the missing values to NaN, not to 0
+    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var)
+
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
 
     ; The title of the figure depends on the data category (CORDEX, CMIP5, ERA5, ...)
     if (data_category.eq.("CORDEX")) then
-    	plot_var@res_tiMainString = info_items[imod]@dataset + " / " + plot_var@long_name  + " / " +  "Mean"
+    	plot_var@res_tiMainString = info_items[imod]@dataset + " / " + plot_var@long_name  + " / " +  "STD"
     else if (data_category.eq.("CMIP5")) then
-    	plot_var@res_tiMainString = info_items[imod]@dataset + " / " + plot_var@long_name  + " / " +  "Mean"
+    	plot_var@res_tiMainString = info_items[imod]@dataset + " / " + plot_var@long_name  + " / " +  "STD"
     else if (data_category.eq.("ERA5")) then
-        plot_var@res_tiMainString = info_items[ref_ind]@dataset + " / " + plot_var@long_name  + " / " +  "Mean"
+        plot_var@res_tiMainString = info_items[ref_ind]@dataset + " / " + plot_var@long_name  + " / " +  "STD"
     ; Here, other else if can be added for other projects
     end if
     end if
@@ -494,26 +498,26 @@ begin
       end if
       end if
     end if
-    
+
     plot_var@res_lbOrientation = "vertical"; vertical label bar
     plot_var@res_gsnMaximize = True ; maximize plot in frame
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels)
     else if (info_items[imod]@short_name.eq.("tas")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels)
     end if
     end if
 
-    wks = gsn_open_wks(file_type, plotpath_abs)
+    wks = gsn_open_wks(file_type, plotpath_std)
     gsn_define_colormap(wks, diag_script_info@cmap)
     plot = contour_map_ce(wks, plot_var, var0)
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres)
     else if (info_items[imod]@short_name.eq.("tas")) then
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
@@ -527,17 +531,17 @@ begin
     delete(plot)
 
 
-; @@@@@@@@@@@@@@  END: Plot for the absolute standard deviation over the total period   @@@@@@@@@@@@@@ 
-    
+; @@@@@@@@@@@@@@  END: Plot for the absolute standard deviation over the total period   @@@@@@@@@@@@@@
+
 ; --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute trend over the total period   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  BEGIN: Plot for the absolute trend over the total period   @@@@@@@@@@@@@@
 
    print(" Ploting absolute plot  Trend")
     ; Trend plot
 
     plot_var = var_all_trend(:, :, 0)
-    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var) 
+    plot_var = where(abs(plot_var).ge.1000.0,plot_var@_FillValue,plot_var)
     plot_var@projection = diag_script_info@projection
     plot_var@res_cnLinesOn = False
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
@@ -557,7 +561,7 @@ begin
     plot_var@res_cnLevels = diag_script_info@trend_levs
     plot_var@res_gsnLeftString = \
       		"Annual / " + start_year + " - " + end_year
-      
+
     if (diag_script_info@show_global_avg) then  ; append global average
       gavg = area_operations(plot_var, -90., 90., 0., 360., "average", True)
       if (info_items[imod]@short_name.eq.("pr")) then
@@ -569,26 +573,26 @@ begin
       end if
       end if
     end if
-    
+
     plot_var@res_lbOrientation = "vertical"; vertical label bar
     plot_var@res_gsnMaximize = True ; maximize plot in frame
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels)
     else if (info_items[imod]@short_name.eq.("tas")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels)
     end if
     end if
 
-    wks = gsn_open_wks(file_type, plotpath_abs)
+    wks = gsn_open_wks(file_type, plotpath_trend)
     gsn_define_colormap(wks, diag_script_info@cmap)
     plot = contour_map_ce(wks, plot_var, var0)
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.84,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.84,0.29, txres)
     else if (info_items[imod]@short_name.eq.("tas")) then
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
@@ -602,7 +606,7 @@ begin
     delete(wks)
     delete(plot)
 
-; @@@@@@@@@@@@@@  END: Plot for the absolute trend over the total period   @@@@@@@@@@@@@@ 
+; @@@@@@@@@@@@@@  END: Plot for the absolute trend over the total period   @@@@@@@@@@@@@@
 
     ; Call provenance logger
     log_provenance(ncdf_avg, \
@@ -614,8 +618,8 @@ begin
                    (/"fran_fr", "righ_ma", "eyri_ve"/), \
                    (/"righi15gmd", "gleckler08jgr"/), \
                    info_items[imod]@filename)
-                   
-                   
+
+
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     ; Difference plot to the reference
     if (.not.l_diff) then
@@ -637,7 +641,7 @@ begin
     ;  plot_var@long_name + " [" + format_units(plot_var@units) + "]"
     plot_var@res_gsnLeftString = \
       		"Annual / " + start_year + " - " + end_year
-      
+
 
     if (diag_script_info@show_global_avg) then  ; append global average
       gavg = area_operations(plot_var, -90., 90., 0., 360., "average", True)
@@ -657,12 +661,12 @@ begin
    ;  end setvalues
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.3E",plot_var@res_cnLevels)
     else if (info_items[imod]@short_name.eq.("tas")) then
-    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels) 
+    	plot_var@res_lbLabelStrings = sprintf ("%5.2f",plot_var@res_cnLevels)
     end if
     end if
-     
+
     gsn_define_colormap(wks, diag_script_info@diff_cmap)
     plot = contour_map_ce(wks, plot_var, var0)
 
@@ -675,22 +679,23 @@ begin
 
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
-    gsn_text_ndc(wks,"Reference dataset: " + info_items[ref_ind]@dataset,0.1,0.2,txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
+    gsn_text_ndc(wks,"Reference dataset: " + info_items[ref_ind]@dataset,0.1,0.2,txres)
 
     if (info_items[imod]@short_name.eq.("pr")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres)
     else if (info_items[imod]@short_name.eq.("tas")) then
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
     end if
 
     delete(plot_var@res_cnLevels)
+    delete(plot_var@res_lbLabelStrings)
     draw(plot)
     frame(wks)
     delete(wks)
     delete(plot)
-    
+
 
 
  ;   ; Apply t-test (assuming different population variances)
@@ -756,7 +761,7 @@ begin
     ;  plot_var@long_name + " [" + format_units(plot_var@units) + "]"
     plot_var@res_gsnLeftString = \
       		"Annual / " + start_year + " - " + end_year
-      
+
     if (diag_script_info@show_global_avg) then  ; append global average
       gavg = area_operations(plot_var, -90., 90., 0., 360., "average", True)
       plot_var@res_gsnRightString = \ diag_script_info@region + " Average: " +
@@ -777,11 +782,11 @@ begin
     txres@txJust        = "CenterLeft"              ; Default is "CenterCenter".
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
-    gsn_text_ndc(wks,"Reference dataset: " + info_items[ref_ind]@dataset,0.1,0.2,txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
+    gsn_text_ndc(wks,"Reference dataset: " + info_items[ref_ind]@dataset,0.1,0.2,txres)
 
     if (plot_var@units.eq.("kg m-2 s-1")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.86,0.29, txres)
     else if (plot_var@units.eq.("K")) then
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
@@ -812,24 +817,24 @@ begin
     plot_var@res_gsnLeftString = \
       		"Annual / " + start_year + " - " + end_year
 
-      
+
     if (diag_script_info@show_global_avg) then  ; append global average
       gavg = area_operations(plot_var, -90., 90., 0., 360., "average", True)
       plot_var@res_gsnRightString = \
         sprintf("%5.2f", gavg) + " " + format_units(plot_var@units)
     end if
-    
+
     wks = gsn_open_wks(file_type, plotpath_diff_trend)
      setvalues NhlGetWorkspaceObjectId()
          "wsMaximumSize" :300000000
      end setvalues
-  
-    var5 = var0 
+
+    var5 = var0
    ; var5@cnLevelSpacingF   = 5
-  
+
     var5@cnRasterSmoothingOn = True
-    
-     
+
+
     gsn_define_colormap(wks, diag_script_info@diff_cmap)
     plot = contour_map_ce(wks, plot_var, var5)
 
@@ -841,11 +846,11 @@ begin
     txres@txJust        = "CenterLeft"              ; Default is "CenterCenter".
 
     ; The region footnote depends on the value of the region string given in the recipe
-    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres) 
+    gsn_text_ndc(wks,"Region: " + diag_script_info@region + " (" + tostring(region(0)) + ", " + tostring(region(1)) + ", " + tostring(region(2)) + ", " + tostring(region(3)) + ")" ,0.1,0.25, txres)
     gsn_text_ndc(wks,"Reference dataset: " + info_items[ref_ind]@dataset,0.1,0.2,txres)
- 
+
     if (plot_var@units.eq.("kg m-2 s-1"+" "+ nyr +"yr~S~-1~N~")) then
-    	gsn_text_ndc(wks, format_units(plot_var@units),0.84,0.29, txres) 
+    	gsn_text_ndc(wks, format_units(plot_var@units),0.84,0.29, txres)
     else
         gsn_text_ndc(wks, format_units(plot_var@units),0.88,0.29, txres)
     end if
@@ -855,7 +860,7 @@ begin
     frame(wks)
     delete(wks)
     delete(plot)
-    
+
 
     ; Call provenance logger
     log_provenance(ncdf_diff, \
